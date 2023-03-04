@@ -1,7 +1,5 @@
 <template>
-  <div
-    class="w-full bg-gray-800 bg-opacity-0 relative rounded-lg  glass"
-  >
+  <div class="w-full bg-gray-800 bg-opacity-0 relative rounded-lg glass">
     <img class="w-full h-80 rounded-lg sm:max-h-80" :src="image" alt="" />
 
     <div class="p-3 flex flex-col gap-2 md:gap-4">
@@ -9,6 +7,7 @@
         class="text-md tracking-tight font-bold text-white dark:text-white md:text-lg"
       >
         {{ title }}
+     
       </h5>
 
       <!-- <div>
@@ -20,11 +19,11 @@
         ></h5>
       </div> -->
       <div class="w-full flex items-align justify-center">
-        <a
-         
+        <router-link
+          :to="{ name: 'movie', query: { is: id } }"
           class="w-full inline-flex justify-center px-6 py-2.5 bg-black text-white font-medium text-xs leading-normal uppercase rounded shadow-md hover:bg-orange-700 hover:shadow-lg focus:bg-orange-600 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-orange-600 active:shadow-lg transition duration-150 ease-in-out"
-        >
-          Book now
+        > 
+          Book now 
           <svg
             aria-hidden="true"
             class="w-4 h-4 ml-2 -mr-1"
@@ -38,7 +37,7 @@
               clip-rule="evenodd"
             ></path>
           </svg>
-        </a>
+        </router-link>
       </div>
     </div>
   </div>

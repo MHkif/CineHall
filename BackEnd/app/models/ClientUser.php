@@ -52,7 +52,7 @@ class ClientUser extends UserModel
         }
     }
 
-    public function token_auth(int $length = 32)
+    public function token_auth(int $length = 8)
     {
         $length = ($length < 4) ? 4 : $length;
         return bin2hex(random_bytes(($length - ($length % 2)) / 2));

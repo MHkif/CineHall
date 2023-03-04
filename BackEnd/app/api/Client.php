@@ -13,95 +13,44 @@ class Client extends Controller
     }
 
 
-
-
     public function register()
     {
         $this->headerHttp();
         $ref = $this->clientModel->token_auth();
-
+        // Check for POST
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
-            $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
+            $_POST = filter_input_array(INPUT_POST, 513);
 
-            // Init data
             $data = [
+
                 'ref' => $ref,
-                'username' => trim($_POST['username']),
-                'email' => trim($_POST['email']),
-                'password' => trim($_POST['password']),
-                'confirm_password' => trim($_POST['confirm_password']),
-                'avatar' => $_FILES['avatar']['name'],
-                'username_err' => '',
-                'email_err' => '',
-                'password_err' => '',
-                'confirm_password_err' => '',
-                'avatar_err' => ''
+                'username' => $_POST['username'],
+                'email' => $_POST['email'],
+                'password' => $_POST['password'],
+                'confirm_password' => $_POST['confirm_password'],
+                // 'avatar' => $_FILES['avatar']['name'],
             ];
 
-            // print_r($data);
-            // exit;
 
-            
+            if ($this->clientModel->register($data)) {
+                // move_uploaded_file($_FILES['avatar']['tmp_name'], './uploads/client/' . $data['avatar']);
 
-            // Validate Email
-            if (empty($data['email'])) {
-                $data['email_err'] = 'Please enter email';
-            } else {
-                // Check email
-                if ($this->clientModel->findUserByEmail($data['email'])) {
-                    $data['email_err'] = 'Email is already taken';
-                }
-            }
-
-
-            // Validate Name
-            if (empty($data['username'])) {
-                $data['username_err'] = 'Please enter your Username';
-            }
-
-            // Validate Password
-            if (empty($data['password'])) {
-                $data['password_err'] = 'Pleae enter Password';
-            } elseif (strlen($data['password']) < 6) {
-                $data['password_err'] = 'Password must be at least 6 characters';
-            }
-
-            // Validate Confirm Password
-            if (empty($data['confirm_password'])) {
-                $data['confirm_password_err'] = 'Please Confirm Password';
-            } else {
-                if ($data['password'] != $data['confirm_password']) {
-                    $data['confirm_password_err'] = 'Passwords do not match';
-                }
-            }
-
-            // Make sure errors are empty
-            if (empty($data['email_err']) && empty($data['username_err']) && empty($data['password_err']) && empty($data['confirm_password_err']) && empty($data['avatar_err'])) {
-                // Validated
-
-                // Hash Password
-                $data['password'] = password_hash($data['password'], PASSWORD_DEFAULT);
-
-                $SignUpUser =  $this->clientModel->register($data);
-
-                // Register User
-                if ($SignUpUser) {
-                    //   flash('register_success', 'You are registered and can log in');
-                    move_uploaded_file($_FILES['avatar']['tmp_name'], './uploads/client/' . $data['avatar']);
-
-                    redirect('pages');
-                    // die('User Sign in');
-                } else {
-                    die('Something went wrong, Not Registred');
+                if ($this->clientModel->login($data['user_ref'])) {
+                    echo json_encode([
+                        'Success' => "Registered With Success",
+                        'Ref' => 'Here is your ref to login with : `' . $this->clientModel->login($data['user_ref'])->ref . '`'
+                    ]);
                 }
             } else {
-                // Load view with errors
-                die('Error : Some Fields Are Empty ');
-                // $this->view('pages', $data);
+                echo json_encode(['Error' => "Registered Failled"]);
             }
         }
     }
+
+
+
+
 
     public function login()
     {
@@ -178,7 +127,6 @@ class Client extends Controller
         $_SESSION[$this->user . '_ref'] = $model->ref;
         $_SESSION[$this->user . '_email'] = $model->email;
         $_SESSION[$this->user . '_name'] = $model->username;
-    
     }
     public function logout()
     {
