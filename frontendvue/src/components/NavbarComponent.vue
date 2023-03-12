@@ -13,24 +13,51 @@
             ><span class="text-red-600">Cine</span> Hall</span
           >
         </a>
+        <!--  Items  -->
+        <div
+          class="hidden items-center justify-between w-full md:flex md:w-auto md:order-1 shadow-lg"
+          id="items"
+        >
+          <ul
+            class="flex flex-col py-3 px-6 mt-4 gap-4 border border-red-700 rounded backdrop-blur-md bg-white/5 shadow-lg md:flex-row md:space-x-8 md:mt-0 md:text-sm md:font-medium "
+          >
+            <router-link
+              class="block py-2 text-gray-200 rounded md:bg-transparent md:p-0"
+              to="/"
+              >Home</router-link
+            >
 
-        <!-- Search Button -->
+            <router-link
+              v-model="user_ref"
+              class="block py-2 text-gray-100 rounded hover:bg-white md:hover:bg-transparent md:hover:text-red-700 md:p-0"
+              to="/myreservations"
+              >Resarvations</router-link
+            >
+          </ul>
+        </div>
+        <!-- auth Buttons -->
         <div class="flex md:order-2">
           <div class="relative hidden md:flex gap-8">
             <router-link
               to="/signup"
               v-if="!user_ref"
-              class="flex items-center text-red-700 font-bold px-3 py-2 rounded backdrop-blur-sm bg-white/10"
+              class="bg-red-500 text-gray-100 px-3 py-2 rounded tracking-wide font-semibold font-display focus:outline-none focus:shadow-outline hover:text-red-600 hover:border border-red-700 hover:bg-gray-900 shadow-lg"
               >Sign in</router-link
             >
-            <button
-              v-else
-              class="flex items-center text-red-700 font-bold pX-3 PY6é rounded backdrop-blur-sm bg-white/10"
-            >
-              logout
-            </button>
 
-            <button
+            <!-- <div
+              v-else
+              class="bg-red-500 text-gray-100 px-3 py-2 rounded tracking-wide font-semibold font-display focus:outline-none focus:shadow-outline hover:text-red-600 hover:border border-red-700 hover:bg-gray-900 shadow-lg"
+              @click="logout"
+            >
+              Logout
+            </div> -->
+            <i
+              @click="logout"
+              class="fa-solid fa-right-from-bracket flex items-center text-gray-100  p-3 rounded focus:outline-none focus:shadow-outline hover:text-red-600 border border-red-700 backdrop-blur-sm bg-white/5 hover:bg-gray-800 shadow-lg"
+            ></i>
+
+            <!-- <button
               class="flex items-center pointer-events-none px-3 py-2 rounded backdrop-blur-sm bg-white/10"
             >
               <svg
@@ -48,33 +75,23 @@
               </svg>
 
               <span class="sr-only">Search icon</span>
-            </button>
+            </button> -->
           </div>
         </div>
-        <!--  Items  -->
-        <div
-          class="items-center justify-between hidden w-full md:flex md:w-auto md:order-1"
-          id="items"
-        >
-          <ul
-            class="flex flex-col py-3 px-6 mt-4 border border-gray-100 rounded-md backdrop-blur-sm bg-white/10 md:flex-row md:space-x-8 md:mt-0 md:text-sm md:font-medium md:border-0"
-          >
-            <li>
-              <router-link
-                class="block py-2 pl-3 pr-4 text-gray-200 rounded md:bg-transparent md:p-0"
-                to="/"
-                >Home</router-link
-              >
-            </li>
 
-            <li>
-              <router-link
-                class="block py-2 pl-3 pr-4 text-gray-200 rounded hover:bg-white md:hover:bg-transparent md:hover:text-red-700 md:p-0"
-                to="/myReservations"
-                >Resarvations</router-link
-              >
-            </li>
-          </ul>
+        <div @click="toggleNav" class="flex md:hidden ">
+          <button
+            type="button"
+            class="flex items-center text-gray-100 p-1 rounded focus:outline-none focus:shadow-outline hover:text-red-700 border border-red-700 bg-gray-900 hover:bg-gray-800 shadow-lg"
+            aria-label="toggle menu"
+          >
+            <svg viewBox="0 0 24 24" class="w-6 h-6 fill-current">
+              <path
+                fill-rule="evenodd"
+                d="M4 5h16a1 1 0 0 1 0 2H4a1 1 0 1 1 0-2zm0 6h16a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2zm0 6h16a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2z"
+              ></path>
+            </svg>
+          </button>
         </div>
       </div>
     </nav>
@@ -87,11 +104,16 @@ export default {
     return {
       user_ref: localStorage.getItem("ref"),
       user_name: localStorage.getItem("user_name"),
+      showMenu: false,
     };
   },
   methods: {
     logout() {
       localStorage.clear();
+      this.$router.push("/login");
+    },
+    toggleNav: function () {
+      this.showMenu = !this.showMenu;
     },
   },
 };

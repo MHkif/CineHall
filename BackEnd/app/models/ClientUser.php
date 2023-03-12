@@ -16,13 +16,13 @@ class ClientUser extends UserModel
     // Regsiter Client
     public function register($data)
     {
-        $this->db->prepareQuery("INSERT INTO " . $this->tableName()  . " (ref, username, email, password, avatar) VALUES(:ref , :username, :email, :password, :avatar)");
+        $this->db->prepareQuery("INSERT INTO " . $this->tableName()  . " (ref, username, email) VALUES(:ref , :username, :email)");
         // Bind values
         $this->db->bind(':ref', $data['ref']);
         $this->db->bind(':username', $data['username']);
         $this->db->bind(':email', $data['email']);
-        $this->db->bind(':password', $data['password']);
-        $this->db->bind(':avatar', "avatar.jpg");
+        // $this->db->bind(':password', $data['password']);
+        // $this->db->bind(':avatar', "avatar.jpg");
 
 
 
@@ -36,16 +36,15 @@ class ClientUser extends UserModel
     }
 
     // Login Admin
-    public function login($ref, $password)
+    public function login($ref)
     {
         $this->db->prepareQuery("SELECT * FROM " . $this->tableName()  . "  WHERE ref = :ref");
         $this->db->bind(':ref', $ref);
 
         $row = $this->db->singleRow();
 
-        $hashed_password = $row->password;
-        if (password_verify($password, $hashed_password)) {
-            // if($hashed_password == $password){
+        if ($row) {
+
             return $row;
         } else {
             return false;

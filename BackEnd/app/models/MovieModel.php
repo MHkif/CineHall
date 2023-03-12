@@ -56,11 +56,34 @@ class MovieModel
 
     public function getMovies()
     {
-        $sql = 'SELECT `id`, `rank`, `hall_id`, `title`, `thumbnail`, `rating`, `year`, `image`, `description`, `trailer`, `genre`, `director`, `writers`, `imdbid`, `date` FROM ' . $this->tableName;
+        // die(var_dump(strtotime($date) != false));
+        $sql = 'SELECT * FROM ' . $this->tableName . ' WHERE date(movies.date) >= now()';
+
         $this->db->prepareQuery($sql);
         $rows = $this->db->allRows();
         return $rows;
     }
+
+    public function filterMovies($date)
+    {
+        // die(var_dump($date));
+        $d = $date;
+        $sqlDate = "SELECT * FROM `movies` WHERE MONTH(movies.date) = MONTH(:id)  AND YEAR(movies.date) = YEAR(NOW()) AND DATE(movies.date) >= NOW()";
+        // $sqlDate = "SELECT * FROM `movies` WHERE movies.date = :i AND DATE(movies.date) >= NOW()";
+
+        $this->db->prepareQuery($sqlDate);
+        $this->db->bind(':id', $date);
+        $rows = $this->db->allRows();
+
+        if ($this->db->rowCount() > 0) {
+            return $rows;
+        } else {
+            return false;
+        }
+    }
+
+
+
 
     public function getMovieById($id)
     {
@@ -79,6 +102,8 @@ class MovieModel
         }
     }
 
+
+
     public function getMovieByCategory($genre)
     {
         $sql = 'SELECT `id`, `rank`, `hall_id`, `title`, `thumbnail`, `rating`, `year`, `image`, `description`, `trailer`, `genre`, `director`, `writers`, `imdbid`, `date` FROM '
@@ -94,7 +119,7 @@ class MovieModel
             return "There is No Movies in This Category  : $genre";
         }
     }
-    
+
 
     public function findMovie($value, $key = "title")
     {
@@ -112,4 +137,39 @@ class MovieModel
             return "There is No Movies Under The $key Of  : $value";
         }
     }
+
+    public function getReservedSeats($data)
+    {
+        $sql = 'SELECT seat_number as "reserved_seat" FROM reservations WHERE movie_id = :movie_id AND hall_id = :hall_id AND show_date = :show_date';
+        $this->db->prepareQuery($sql);
+        $this->db->bind(':movie_id', $data["movie_id"]);
+        $this->db->bind(':hall_id', $data["hall_id"]);
+        $this->db->bind(':show_date', $data["show_date"]);
+        $rows =  $this->db->columns();
+        if ($this->db->rowCount() > 0 && $this->db->rowCount() < 50) {
+            return $rows;
+        } else if ($this->db->rowCount() == 50) {
+            return 'Full';
+        } else {
+            return false;
+        }
+    }
+
+
+
+    // public function getTakenSeats($id)
+    // {
+    //     $query = " WHERE id = :id";
+    //     $sql = 'SELECT * FROM '
+    //         . $this->tableName . ' ' . $query;
+    //     $this->db->prepareQuery($sql);
+    //     $this->db->bind(':id', $id);
+    //     $rows = $this->db->singleRow();
+
+    //     if ($rows->seats < 50) {
+    //         return true;
+    //     } else {
+    //         return "There is No Available Seats";
+    //     }
+    // }
 }

@@ -11,42 +11,26 @@ class ReservationModel
         $this->tableName = 'reservations';
     }
 
-    public function heardersHttp(){
-        
-    }
 
     public function reserveSeat($data)
     {
-        $isAlraedyTaken = $this->checkSeat($data['hall_id'], $data['seat']);
-        $hall_id = $data['hall_id'];
+        $isAlraedyTaken = $this->checkSeat($data['hall_id'], $data['movie_id'], $data['show_date'], $data['seat']);
+        // $hall_id = $data['hall_id'];
         if (!$isAlraedyTaken) {
-
-            // $sql2 = 'UPDATE halls SET seats = seats+1 WHERE id = ' . $data['hall_id'];
-
-            $sql = 'INSERT INTO `reservations`(`user_ref`, `hall_id`, `seat_number`)
-             VALUES (:user_ref, :hall_id, :seat_number)';
+            $sql = 'INSERT INTO `reservations`(`user_ref`, `movie_id`, `seat_number`, `hall_id`, `show_date`)
+             VALUES (:user_ref, :movie_id, :seat_number, :hall_id, :show)';
 
             $this->db->prepareQuery($sql);
             $this->db->bind(':user_ref', $data['user_ref']);
             $this->db->bind(':hall_id', $data['hall_id']);
+            $this->db->bind(':movie_id', $data['movie_id']);
             $this->db->bind(':seat_number', $data['seat']);
+            $this->db->bind(':show', $data['show_date']);
 
             if ($this->db->execute()) {
-                // $this->db->prepareQuery($sql2);
-                // if ($this->db->execute()) {
-                //     return true;
-                // } else {
-                //     return false;
-                // }
-                $isUpdated = $this->updateHallSeats('seats-1', $hall_id);
-                if ($isUpdated) {
-                    return 'The Reservation has been Made successfully';
-                } else {
-                    return false;
-                }
+                return true;
             } else {
-                return false;
-                // echo 'FALSE';
+                echo 'The Reservation has deos not Made successfully';
             }
         } else {
             echo "This Seat of number " . $data['seat'] . " in This hall Has been Already Taken .";
@@ -54,17 +38,53 @@ class ReservationModel
     }
 
 
-    public function checkSeat($hall_id, $seat)
+    public function checkSeat($hall_id, $movie_id, $show_date,  $seat)
     {
-        $sql = 'SELECT * FROM ' . $this->tableName . ' WHERE hall_id = :hall_id AND seat_number = :seat';
+        $sql = 'SELECT * FROM ' . $this->tableName . ' WHERE hall_id = :hall_id AND movie_id = :movie AND show_date = :show_date AND seat_number = :seat';
         $this->db->prepareQuery($sql);
         $this->db->bind(':hall_id', $hall_id);
         $this->db->bind(':seat', $seat);
+        $this->db->bind(':show_date', $show_date);
+        $this->db->bind(':movie', $movie_id);
 
         $row = $this->db->singleRow();
 
         if ($this->db->rowCount() > 0) {
             return true;
+        } else {
+            return false;
+        }
+    }
+
+    // public function getReservedSeats($movie_id)
+    // {
+    //     $sql = 'SELECT COUNT(*) as "rows_number", r.id as "res_id", r.show_date as "show_date",  r.user_ref as "user_ref", r.hall_id as "hall_id", m.id as "id_of_movie" FROM reservations r INNER JOIN movies m ON m.id = r.movie_id WHERE m.id = :movie_id  AND m.date = r.show_date AND m.hall_id = r.hall_id';
+    //     $this->db->prepareQuery($sql);
+    //     $this->db->bind(':movie_id', $movie_id);
+    //     $rows = $this->db->singleRow();
+    //     if ($rows->rows_number < 50) {
+    //         return true;
+    //     } else {
+    //         return false;
+    //     }
+    // }
+
+
+    public function countReservedSeats($data)
+    {
+
+
+
+        $sql = 'SELECT * FROM reservations  WHERE movie_id = :movie_id AND hall_id = :hall_id AND show_date = :show_date';
+        $this->db->prepareQuery($sql);
+        $this->db->bind(':movie_id', $data["movie_id"]);
+        $this->db->bind(':hall_id', $data["hall_id"]);
+        $this->db->bind(':show_date', $data["show_date"]);
+        $rows = $this->db->allRows();
+        // return $this->db->rowCount();
+        if ($this->db->rowCount() < 50) {
+            return true;
+            // return $rows;
         } else {
             return false;
         }
@@ -84,19 +104,21 @@ class ReservationModel
         }
     }
 
-    public function getAllUserReservations()
+    public function getAllUserReservations($user_ref)
     {
-        $sql = 'SELECT * FROM ' . $this->tableName . ' WHERE user_ref = :user_ref';
+        $sql = 'SELECT r.*, r.id as "res_id", m.id as "id_of_movie", m.* FROM reservations r INNER JOIN movies m ON m.id = r.movie_id  WHERE user_ref = :user_ref';
         $this->db->prepareQuery($sql);
-        $this->db->bind(':user_ref', $_SESSION['client_ref']);
+        $this->db->bind(':user_ref', $user_ref);
         $rows = $this->db->allRows();
 
         if ($this->db->rowCount() > 0) {
             return $rows;
         } else {
-            return "There is No Reservations Made By : " . $_SESSION['client_name'];
+            return false;
         }
     }
+
+
 
 
     public function getReservationById($id)
@@ -148,32 +170,33 @@ class ReservationModel
             false;
         }
     }
-    public function cancelReservation($res_id)
+    public function cancelReservation($data)
     {
-        $sql = 'SELECT * FROM reservations WHERE hall_id IN (SELECT hall_id FROM movies WHERE DATEDIFF(date , CURDATE()) > 1) AND id = :id';
+        $sql = 'SELECT * FROM reservations WHERE movie_id IN (SELECT id FROM movies WHERE DATEDIFF(date , CURDATE()) > 1) AND id = :id AND user_ref = :ref';
         $this->db->prepareQuery($sql);
-        $this->db->bind(':id', $res_id);
+        $this->db->bind(':id', $data['res_id']);
+        $this->db->bind(':ref', $data['user_ref']);
         if ($this->db->execute()) {
             $reservation = $this->db->singleRow();
 
             if ($this->db->rowCount() === 0) {
-                return "There is No Rservation Under This ID  : $res_id To Cancel .";
+                return "empty";
             } else {
                 // $this->db->prepareQuery('DELETE FROM reservations WHERE id = :res_id');
                 // $this->db->bind(":res_id", $id);
                 // $this->db->execute();
                 $hall_id = $reservation->hall_id;
                 // return $hall_id;
-                $isDeleted = $this->deletReservation($res_id);
+                $isDeleted = $this->deletReservation($data['res_id']);
                 if ($isDeleted) {
-                    $isUpdated = $this->updateHallSeats('seats-1', $hall_id);
+                    $isUpdated = $this->updateMovieSeats('seats-1', $hall_id);
                     if ($isUpdated) {
                         return 'The Reservation has been deleted successfully';
                     } else {
-                        return "The Hall's Seats had not been Updated due to Unkown Error";
+                        return false;
                     }
                 } else {
-                    return 'The Reservation has not deleted due to Unknown Error';
+                    return false;
                 }
             }
         } else {
@@ -194,7 +217,7 @@ class ReservationModel
 
     public function updateHallSeats($state, $hall_id)
     {
-        $sql = "UPDATE halls SET seats = $state WHERE id = $hall_id";
+        $sql = "UPDATE halls SET seats =" . $state . " WHERE id = :id";
         $this->db->prepareQuery($sql);
         $this->db->bind(":id", $hall_id);
         if ($this->db->execute()) {
@@ -203,6 +226,21 @@ class ReservationModel
             return false;
         }
     }
+
+    public function updateMovieSeats($state, $movie_id)
+    {
+        $sql = "UPDATE movies SET seats =" . $state . " WHERE id = :id";
+        $this->db->prepareQuery($sql);
+        $this->db->bind(":id", $movie_id);
+        if ($this->db->execute()) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+
+
     // public function cancelReservaion($res_id)
     // {
     //     $this->db->query('SELECT * FROM reservations WHERE hall_id IN (SELECT hall_id FROM films WHERE DATEDIFF(date , CURDATE()) > 1) AND id = :res_id');

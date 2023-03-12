@@ -10,16 +10,16 @@ abstract class UserModel
     abstract public function register($data);
 
     // Login User
-    abstract public function login($email, $password);
+    abstract public function login($email);
 
-    abstract public function token_auth();
-
-    // Find user by email
-    abstract public function findUserByEmail($email);
+    // abstract public function token_auth();
 
     // Find user by email
-    abstract public function findUserByRef($email);
+    // abstract public function findUserByEmail($email);
 
-    // Get User by ID
-    abstract public function getUserById($id);
+    // Find user by email
+    abstract public function findUserByRef($ref);
+
+    // // Get User by ID
+    // abstract public function getUserById($id);
 }

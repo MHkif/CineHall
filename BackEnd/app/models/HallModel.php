@@ -134,6 +134,22 @@ class HallModel
         }
     }
 
+    public function getAvailableHall($id)
+    {
+        $query = " WHERE id = :id";
+        $sql = 'SELECT * FROM '
+            . $this->tableName . ' ' . $query;
+        $this->db->prepareQuery($sql);
+        $this->db->bind(':id', $id);
+        $rows = $this->db->singleRow();
+
+        if ($rows->seats < 50) {
+            return true;
+        } else {
+            return "There is No Available Seats";
+        }
+    }
+
     public function getEmptySeats($id)
     {
         $query = " WHERE id = :id AND seats < 50";

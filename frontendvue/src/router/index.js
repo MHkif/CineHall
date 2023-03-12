@@ -2,7 +2,8 @@ import { createRouter, createWebHistory } from "vue-router";
 import HomeView from "../views/HomeView.vue";
 import ReservationsView from "../views/ReservationsView.vue";
 import MovieView from "../views/MovieView.vue";
-import Register from "../views/RegisterView.vue"
+import Register from "../views/RegisterView.vue";
+import Login from "../views/LoginView.vue";
 
 const routes = [
   {
@@ -19,13 +20,19 @@ const routes = [
     path: "/movie",
     name: "movie",
     component: MovieView,
-    props : (route) =>({ id: route.query.id }),
+    props: (route) => ({ id: route.query.id }),
   },
   {
-    path:"/signup",
-    name:"signup",
-    component: Register
-  }
+    path: "/signup",
+    name: "signup",
+    component: Register,
+  },
+
+  {
+    path: "/login",
+    name: "login",
+    component: Login,
+  },
 ];
 
 const router = createRouter({

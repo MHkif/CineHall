@@ -1,8 +1,6 @@
 <template>
   <div
-    id="paginated-list"
-    data-current-page="1"
-    aria-live="polite"
+   
     class="grid grid-cols-1 gap-4 sm:grid-cols-2 items-start md:grid-cols-3 lg:grid-cols-4"
   >
     <CardComponent
@@ -11,6 +9,7 @@
       :image="movie.image"
       :title="movie.title"
       :id="movie.id"
+      :hall_id="movie.hall_id"
     />
   </div>
 </template>

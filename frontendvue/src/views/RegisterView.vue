@@ -17,7 +17,7 @@
             <form
               class="flex flex-col gap-6"
               enctype="multipart/form-data"
-              @submit.prevent="handleSubmit"
+              @submit.prevent="register"
             >
               <div class="relative space-y-2 self-center">
                 <div
@@ -51,7 +51,7 @@
                     placeholder="Choose a name"
                   />
                 </div>
-                <!-- <div class="space-y-1 md:space-y-2 w-full">
+                <div class="space-y-1 md:space-y-2 w-full">
                   <div
                     class="text-left text-md font-medium text-gray-500 tracking-wide"
                   >
@@ -64,7 +64,7 @@
                     v-model="email"
                     placeholder="Email Address"
                   />
-                </div> -->
+                </div>
               </div>
               <!-- <div class="gap-5 flex flex-col md:flex-row md:gap-8">
                 <div class="space-y-1 md:space-y-2 w-full">
@@ -98,8 +98,7 @@
               </div> -->
 
               <input
-                type="button"
-                @click="register()" 
+                type="submit"
                 value="Sign Up"
                 class="bg-red-500 text-gray-100 p-3 w-full rounded tracking-wide font-semibold font-display focus:outline-none focus:shadow-outline hover:text-red-600 hover:border border-red-700 hover:bg-gray-900 shadow-lg md:mt-4"
               />
@@ -109,8 +108,10 @@
               class="mt-3 text-sm font-display font-semibold text-gray-500 text-center md:mt-8"
             >
               Already have an account ?
-              <a class="cursor-pointer text-red-600 hover:text-red-800"
-                >Sign in</a
+              <router-link
+                to="/login"
+                class="cursor-pointer text-red-600 hover:text-red-800"
+                >Sign in</router-link
               >
             </div>
           </div>
@@ -284,61 +285,74 @@
 
 <script>
 import axios from "axios";
+import Swal from "sweetalert2";
 export default {
   name: "RegisterView",
 
   data() {
     return {
       username: "",
-      // email: "",
-      // password: "",
-      // confirm_password: "",
+      email: "",
     };
   },
   methods: {
-    register() {
+    async register() {
       const data = new FormData();
       data.append("username", this.username);
+      data.append("email", this.email);
 
-      // const data = {
-      //   username: this.username,
-      //   email: this.email,
-      //   password: this.password,
-      //   confirm_password: this.confirm_password,
-      // };
-      // console.log(data);
-      if (this.username != "") {
+      if (this.username != "" && this.email != "") {
         axios({
           url: "http://localhost/CineHall/BackEnd/client/register",
           method: "post",
           data: data,
         })
-          .then((res) => {
-            alert(res);
+          .then(async (res) => {
+            // Use sweetalert2
+            let ref = res.data["Ref"];
+            await Swal.fire({
+              icon: "success",
+              title: "Done!",
+              text: `${res.data.Success}`,
+              footer: `${res.data.Ref}`,
+              confirmButtonText: "Save Your Ref ",
+              confirmButtonColor: "#1C1B1F",
+            }).then(async () => {
+         
+              navigator.clipboard.writeText(ref);
+              await Swal.fire({
+                position: "center",
+                icon: "success",
+                title: "Your Reference has been saved",
+                showConfirmButton: false,
+                timer: 1500,
+              });
+              window.location = "http://localhost:3000/login";
+            });
+            this.username = "";
+            this.email = "";
+            // window.location = "http://localhost:3000/";
           })
           .catch((err) => {
-            alert(err);
+            Swal.fire({
+              icon: "error",
+              title: "Oops...",
+              text: "Something went wrong!",
+              footer: err,
+            });
+            window.location = "http://localhost:3000/signup";
           });
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Failed",
+          text: "Please Fill All The Field",
+          // confirmButtonColor: "red",
+          showConfirmButton: false,
+        });
       }
     },
-    // signUp: async function () {
-    //   await axios
-    //     .post("http://localhost/CineHall/BackEnd/client/register", {
-    //       username: this.username,
-    //       email: this.email,
-    //       password: this.password,
-    //       confirm_password: this.confirm_password,
-    //     })
-    //     .then((res) => {
-    //       alert(res);
-    //     })
-    //     .catch((err) => {
-    //       alert(err);
-    //     });
-    // },
   },
-  // mounted() {
-  //   this.signUp();
-  // },
+ 
 };
 </script>
