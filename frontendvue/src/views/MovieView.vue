@@ -66,6 +66,14 @@
                 {{ movie.rating }}
               </h1>
             </div>
+            <div
+              class="flex items-center justify-between pb-4 border-b border-gray-700"
+            >
+              <h1 class="text-white font-medium">Hall</h1>
+              <h1 class="text-red-600 font-medium">
+                {{ movie.hall_id }}
+              </h1>
+            </div>
           </div>
         </div>
         <div
@@ -77,56 +85,6 @@
       </div>
 
       <div class="py-16 space-y-16">
-        <div
-          class="flex flex-col justify-center items-center gap-6 md:items-end md:flex-row"
-        >
-          <div class="">
-            <label
-              for="hall"
-              class="block mb-2 text-sm text-left font-medium text-gray-100 dark:text-white"
-              >Hall</label
-            >
-            <!-- <input type="text" name="port_depart" id="port_depart" class="bg-white border border-gray-300 text-gray-900 text-sm rounded focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" placeholder="Port name" required> -->
-            <select
-              name="hall"
-              id="hall"
-              v-model="selectedHall"
-              @change="getMovieReservedSeats"
-              class="bg-gray-800 border border-gray-400 rounded py-2.5 px-3 block focus:ring-red-500 focus:border-red-500 text-gray-100"
-            >
-              <option
-                v-for="hall in this.halls"
-                :key="hall.id"
-                :value="hall.id"
-              >
-                {{ hall.name }}
-              </option>
-            </select>
-          </div>
-          <div class="">
-            <label
-              for="hall"
-              class="block mb-2 text-sm text-left font-medium text-gray-100 dark:text-white"
-              >Show Date
-            </label>
-            <input
-              type="date"
-              name="filterDate"
-              id="inpuDate"
-              :min="this.currentDate"
-              v-model="selectedDate"
-              @change="getMovieReservedSeats"
-              class="bg-gray-800 border border-gray-400 rounded py-2 px-3 block focus:ring-red-500 focus:border-red-500 text-gray-100"
-            />
-          </div>
-          <input
-            type="button"
-            @click="getMovieReservedSeats"
-            value="Search"
-            class="bg-red-500 text-gray-100 py-2.5 px-6 rounded tracking-wide font-semibold font-display focus:outline-none focus:shadow-outline hover:text-red-600 hover:border border-red-700 hover:bg-gray-900 shadow-lg md:mt-4"
-          />
-        </div>
-
         <div class="space-y-16">
           <div
             v-if="!full"
@@ -180,13 +138,16 @@ export default {
       currentDate: new Date().toISOString().substring(0, 10),
       reservedSeats: [],
       halls: [],
-      selectedHall: 1,
+
       full: "",
     };
   },
-  async mounted() {
+
+  mounted() {
     this.getMovie();
     this.getHall();
+    console.log(this.$route);
+    // this.removeWeekend();
   },
   methods: {
     // changes() {
@@ -202,7 +163,7 @@ export default {
     getMovie() {
       axios
         .get(
-          `http://localhost/CineHall/BackEnd/movies/getMovie/${this.$route.query.is}`
+          `http://localhost/CineHall/BackEnd/movies/getMovie/${this.$route.query.id}`
         )
         .then((res) => (this.movie = res.data))
         .then(() => {
@@ -213,8 +174,8 @@ export default {
       // console.log("Hall Id : ", this.movie.hall_id);
       const seatsForm = new FormData();
       // formdata.append("user_ref", this.user_ref);
-      seatsForm.append("hall_id", this.selectedHall);
-      seatsForm.append("show_date", this.selectedDate);
+      seatsForm.append("hall_id", this.movie.hall_id);
+      seatsForm.append("show_date", this.$route.query.date);
       seatsForm.append("movie_id", this.movie.id);
       // formdata.append("seat", seat);
       axios({
@@ -254,13 +215,24 @@ export default {
         method: "get",
       }).then((res) => (this.halls = res.data));
     },
+    // removeWeekend() {
+    //   const picker = document.getElementById("date1");
+    //   picker.addEventListener("change", function (e) {
+    //     var day = new Date(this.value).getDay();
+    //     if (day === 0) {
+    //       e.preventDefault();
+    //       this.value = "";
+    //       alert("Weekends not allowed");
+    //     }
+    //   });
+    // },
     reserve(seat) {
       if (seat != null) {
         if (!this.reservedSeats.includes(seat)) {
           const formdata = new FormData();
           formdata.append("user_ref", this.user_ref);
-          formdata.append("hall_id", this.selectedHall);
-          formdata.append("show_date", this.selectedDate);
+          formdata.append("hall_id", this.movie.hall_id);
+          formdata.append("show_date", this.$route.query.date);
           formdata.append("movie_id", this.movie.id);
           formdata.append("seat", seat);
 

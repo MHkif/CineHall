@@ -124,8 +124,13 @@ class Reservations extends Controller
             $data = [
                 'user_ref' => $_POST['user_ref'],
                 'res_id' => $_POST['res_id'],
+                'movie_id' => $_POST['movie_id'],
+                'hall_id' => $_POST['hall_id'],
             ];
             $response = $this->reservModel->cancelReservation($data);
+            if ($response === "OutOfDate") {
+                echo json_encode(['Error' => "It is Too Late To Cancel Your Reservation ."]);
+            }
             if ($response === "empty") {
                 echo json_encode(['Error' => "There is No Reservation Under This ID  : " . $data['res_id'] . " Taken by :" . $data['user_ref'] . "  To Cancel ."]);
             } else if ($response != false) {

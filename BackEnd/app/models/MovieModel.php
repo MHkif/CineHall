@@ -68,11 +68,12 @@ class MovieModel
     {
         // die(var_dump($date));
         $d = $date;
-        $sqlDate = "SELECT * FROM `movies` WHERE MONTH(movies.date) = MONTH(:id)  AND YEAR(movies.date) = YEAR(NOW()) AND DATE(movies.date) >= NOW()";
-        // $sqlDate = "SELECT * FROM `movies` WHERE movies.date = :i AND DATE(movies.date) >= NOW()";
+        // $sqlDate = "SELECT * FROM `movies` WHERE MONTH(movies.date) = MONTH(:id)  AND YEAR(movies.date) = YEAR(NOW()) AND DATE(movies.date) >= NOW()";
+        $sqlDate = "SELECT sh.*, m.* FROM shown_movies sh INNER JOIN movies m ON m.id = sh.movie_id WHERE date(sh.date) = date(:d) AND date(:d) >= date(now()) AND sh.seats < 50
+        ";
 
         $this->db->prepareQuery($sqlDate);
-        $this->db->bind(':id', $date);
+        $this->db->bind(':d', $date);
         $rows = $this->db->allRows();
 
         if ($this->db->rowCount() > 0) {

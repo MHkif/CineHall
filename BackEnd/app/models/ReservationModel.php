@@ -27,10 +27,16 @@ class ReservationModel
             $this->db->bind(':seat_number', $data['seat']);
             $this->db->bind(':show', $data['show_date']);
 
+
             if ($this->db->execute()) {
-                return true;
+                $isUpdated = $this->updateMovieSeats('seats+1', $data['hall_id'], $data['show_date']);
+                if ($isUpdated) {
+                    return true;
+                } else {
+                    return false;
+                }
             } else {
-                echo 'The Reservation has deos not Made successfully';
+                echo 'The Reservation has deos not Made successfully';;
             }
         } else {
             echo "This Seat of number " . $data['seat'] . " in This hall Has been Already Taken .";
@@ -170,37 +176,65 @@ class ReservationModel
             false;
         }
     }
+    public function checkShow_date($hall_id, $movie_id)
+    {
+        $sql = 'SELECT * FROM shown_movies WHERE hall_id = :hall_id AND (DATEDIFF(shown_movies.date , CURDATE()) > 1) AND movie_id = :movie';
+        $this->db->prepareQuery($sql);
+        $this->db->bind(':hall_id', $hall_id);
+        $this->db->bind(':movie', $movie_id);
+
+        $row = $this->db->singleRow();
+
+        if ($this->db->rowCount() > 0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     public function cancelReservation($data)
     {
-        $sql = 'SELECT * FROM reservations WHERE movie_id IN (SELECT id FROM movies WHERE DATEDIFF(date , CURDATE()) > 1) AND id = :id AND user_ref = :ref';
-        $this->db->prepareQuery($sql);
-        $this->db->bind(':id', $data['res_id']);
-        $this->db->bind(':ref', $data['user_ref']);
-        if ($this->db->execute()) {
-            $reservation = $this->db->singleRow();
+        // die(print_r($data));
+        // $sql = 'SELECT * FROM reservations WHERE movie_id IN (SELECT movie_id FROM shown_movies WHERE DATEDIFF(date , CURDATE()) > 1) AND id = :id AND user_ref = :ref';
+        $sql = 'SELECT * FROM reservations WHERE id = :id AND user_ref = :ref';
+        $isOutOfDate = $this->checkShow_date($data['hall_id'], $data['movie_id']);
 
-            if ($this->db->rowCount() === 0) {
-                return "empty";
-            } else {
-                // $this->db->prepareQuery('DELETE FROM reservations WHERE id = :res_id');
-                // $this->db->bind(":res_id", $id);
-                // $this->db->execute();
+        if ($isOutOfDate) {
+            $this->db->prepareQuery($sql);
+            $this->db->bind(':id', $data['res_id']);
+            $this->db->bind(':ref', $data['user_ref']);
+            if ($this->db->execute()) {
+                $reservation = $this->db->singleRow();
+
                 $hall_id = $reservation->hall_id;
-                // return $hall_id;
-                $isDeleted = $this->deletReservation($data['res_id']);
-                if ($isDeleted) {
-                    $isUpdated = $this->updateMovieSeats('seats-1', $hall_id);
-                    if ($isUpdated) {
-                        return 'The Reservation has been deleted successfully';
+                $show_date = $reservation->show_date;
+
+                if ($this->db->rowCount() === 0) {
+                    return "empty";
+                } else {
+                    // $this->db->prepareQuery('DELETE FROM reservations WHERE id = :res_id');
+                    // $this->db->bind(":res_id", $id);
+                    // $this->db->execute();
+                    // return $hall_id;
+                    $isDeleted = $this->deletReservation($data['res_id']);
+                    // $date1 = date_create("2013-03-15");
+
+                    if ($isDeleted) {
+                        $isUpdated = $this->updateMovieSeats('seats-1', $hall_id, $show_date);
+                        if ($isUpdated) {
+                            return 'The Reservation has been deleted successfully';
+                        } else {
+                            return false;
+                        }
                     } else {
                         return false;
                     }
-                } else {
-                    return false;
                 }
+            } else {
+                return 'The Reservation has not deleted According to unknown Error during the Execution';
             }
         } else {
-            return 'The Reservation has not deleted According to unknown Error during the Execution';
+            return "OutOfDate";
         }
     }
 
@@ -227,11 +261,12 @@ class ReservationModel
         }
     }
 
-    public function updateMovieSeats($state, $movie_id)
+    public function updateMovieSeats($state, $hall_id, $date)
     {
-        $sql = "UPDATE movies SET seats =" . $state . " WHERE id = :id";
+        $sql = "UPDATE shown_movies SET seats =" . $state . " WHERE hall_id = :hall_id AND date = :date";
         $this->db->prepareQuery($sql);
-        $this->db->bind(":id", $movie_id);
+        $this->db->bind(":hall_id", $hall_id);
+        $this->db->bind(":date", $date);
         if ($this->db->execute()) {
             return true;
         } else {

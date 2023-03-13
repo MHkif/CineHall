@@ -1,5 +1,13 @@
 <template>
-  <router-link :to="{ name: 'movie', query: { is: id } }">
+  <router-link
+    :to="{
+      name: 'movie',
+      query: {
+        id: id,
+        date: date,
+      },
+    }"
+  >
     <div class="w-full bg-gray-800 bg-opacity-0 relative rounded-lg glass">
       <img class="w-full h-80 rounded-lg sm:max-h-80" :src="image" alt="" />
 
@@ -20,7 +28,13 @@
       </div> -->
         <div class="w-full flex items-align justify-center">
           <router-link
-            :to="{ name: 'movie', query: { is: id } }"
+            :to="{
+              name: 'movie',
+              query: {
+                id: id,
+                date: date,
+              },
+            }"
             class="w-full inline-flex justify-center px-6 py-2.5 bg-black text-white font-medium text-xs leading-normal uppercase rounded shadow-md hover:bg-orange-700 hover:shadow-lg focus:bg-orange-600 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-orange-600 active:shadow-lg transition duration-150 ease-in-out"
           >
             Book now

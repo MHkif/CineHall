@@ -20,7 +20,8 @@ const routes = [
     path: "/movie",
     name: "movie",
     component: MovieView,
-    props: (route) => ({ id: route.query.id }),
+    // props: true,
+    // props: (route) => ({ id: route.query.test }),
   },
   {
     path: "/signup",

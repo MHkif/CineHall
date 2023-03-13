@@ -67,11 +67,13 @@ export default {
           }
         });
     },
-    cancel(res_id, ref) {
+    cancel(res_id, ref, movie_id, hall_id) {
       console.log("id : ", res_id, "user_ref : ", ref);
       const formdata = new FormData();
       formdata.append("user_ref", ref);
       formdata.append("res_id", res_id);
+      formdata.append("movie_id", movie_id);
+      formdata.append("hall_id", hall_id);
 
       axios({
         url: "http://localhost/CineHall/BackEnd/reservations/cancelReservation",

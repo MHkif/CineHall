@@ -1,5 +1,5 @@
 <template>
-  <div class="home bg-gray-900">
+  <div class="home bg-gray-900 h-full">
     <NavbarComponent />
 
     <!-- Movies -->
@@ -13,8 +13,8 @@
         >
           All Movies
         </h1>
-        <div>
-          <input
+        <!-- <div> -->
+        <!-- <input
             type="text"
             name="searchName"
             id="inputMovie"
@@ -23,13 +23,22 @@
             placeholder="Search a Movie"
             class="bg-gray-100 border border-gray-500 rounded py-1 px-3 block focus:ring-red-500 focus:border-red-500 text-gray-100"
           />
-        </div>
+        </div> -->
+        <input
+          type="date"
+          name="filterDate"
+          id="dateInput"
+          :min="this.currentDate"
+          v-model="selectedDate"
+          @change="getMovies"
+          class="bg-gray-800 border border-gray-400 rounded py-2 px-3 block focus:ring-red-500 focus:border-red-500 text-gray-100"
+        />
       </div>
 
-      <Cards v-if="!empty" :movies="movies" />
+      <Cards v-if="movies.length" :movies="movies" :date="selectedDate" :hall="1"/>
       <div
-        v-if="this.empty"
-        class="flex flex-col items-center justify-center text-2xl text-gray-100 mt-20"
+        v-else
+        class="flex justify-center items-center text-2xl text-gray-100 min-h-screen"
       >
         {{ empty }}
       </div>
@@ -50,10 +59,11 @@ export default {
   },
   data() {
     return {
-      movies: "",
+      movies: [],
       user_ref: localStorage.getItem("ref"),
       user_name: localStorage.getItem("user_name"),
-      inputDate: "",
+      selectedDate: new Date().toISOString().substring(0, 10),
+      currentDate: new Date().toISOString().substring(0, 10),
       empty: "",
     };
   },
@@ -63,38 +73,58 @@ export default {
     //   console.log("Input Date  : ", this.inputDate);
     //   this.filterMovies();
     // },
+    removeWeekend() {
+      const picker = document.getElementById("dateInput");
+      picker.addEventListener("change", function () {
+        var day = new Date(this.value).getDay();
+        if (day === 0) {
+          this.empty = "It is Saturday !"
+          // e.reload();
+          this.value = "";
+        
+          alert("Weekends not allowed").then(()=> this.removeWeekend() );
+        }
+      });
+    },
     logout() {
       localStorage.clear();
     },
-    searchMovies() {
+    getMovies() {
+      console.log("Selected Date  : ", this.selectedDate);
       axios
         .get(
-          `http://localhost/CineHall/BackEnd/movies/filterMovies/${this.inputDate}`
+          `http://localhost/CineHall/BackEnd/movies/filterMovies/${this.selectedDate}`
         )
         .then((res) => {
           this.movies = res.data;
           if (res.data.Success) {
             this.movies = res.data.Success;
+           
             this.empty = "";
           } else if (res.data.Empty) {
+            this.movies = [];
             this.empty = res.data.Empty;
           }
-          // console.log('Filter Movies  : ', this.movies);
+          console.log("Filter Movies  : ", this.movies);
         });
     },
   },
   async beforeMount() {
-    await axios
-      .get(`http://localhost/CineHall/BackEnd/movies/getAllMovies`)
-      .then((res) => {
-        this.movies = res.data;
-        // console.log('Movies  : ', this.movies);
-      });
+    // await axios
+    //   .get(`http://localhost/CineHall/BackEnd/movies/getAllMovies`)
+    //   .then((res) => {
+    //     this.movies = res.data;
+    //     // console.log('Movies  : ', this.movies);
+    //   });
+    this.getMovies();
   },
   beforeCreate() {
     if (!localStorage.getItem("ref")) {
       this.$router.push("/login");
     }
+  },
+  mounted() {
+    this.removeWeekend();
   },
 };
 </script>
