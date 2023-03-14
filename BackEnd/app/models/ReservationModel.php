@@ -112,7 +112,7 @@ class ReservationModel
 
     public function getAllUserReservations($user_ref)
     {
-        $sql = 'SELECT r.*, r.id as "res_id", m.id as "id_of_movie", m.* FROM reservations r INNER JOIN movies m ON m.id = r.movie_id  WHERE user_ref = :user_ref';
+        $sql = 'SELECT r.*, r.id as "res_id", m.id as "id_of_movie", m.*, h.id as "id_of_hall" , h.name as "hall_name" FROM reservations r INNER JOIN movies m ON m.id = r.movie_id INNER JOIN halls h ON r.hall_id = h.id WHERE user_ref = :user_ref AND date(r.show_date) >= date(now())';
         $this->db->prepareQuery($sql);
         $this->db->bind(':user_ref', $user_ref);
         $rows = $this->db->allRows();

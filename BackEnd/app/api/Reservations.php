@@ -129,12 +129,12 @@ class Reservations extends Controller
             ];
             $response = $this->reservModel->cancelReservation($data);
             if ($response === "OutOfDate") {
-                echo json_encode(['Error' => "It is Too Late To Cancel Your Reservation ."]);
+                echo json_encode(['OutOfDate' => "It is Too Late To Cancel Your Reservation ."]);
+                return;
             }
             if ($response === "empty") {
                 echo json_encode(['Error' => "There is No Reservation Under This ID  : " . $data['res_id'] . " Taken by :" . $data['user_ref'] . "  To Cancel ."]);
             } else if ($response != false) {
-
                 echo json_encode(['Success' => $response]);
             } else {
                 echo json_encode(['Error' => 'The Reservation has not deleted due to Unknown Error']);

@@ -119,7 +119,6 @@
 
 <script>
 import NavbarComponent from "@/components/NavbarComponent.vue";
-// import CardComponent from "@/components/CardComponent.vue";
 import Swal from "sweetalert2";
 import axios from "axios";
 

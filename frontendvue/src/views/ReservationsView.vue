@@ -30,6 +30,8 @@
 <script>
 import NavbarComponent from "@/components/NavbarComponent.vue";
 import ReservationTable from "@/components/ReservationTable.vue";
+import Swal from "sweetalert2";
+
 import axios from "axios";
 
 export default {
@@ -85,8 +87,17 @@ export default {
             console.log(res.data.Success);
           } else if (res.data.Error) {
             console.log(res.data.Error);
+          } else if (res.data.OutOfDate) {
+            Swal.fire({
+              icon: "error",
+              title: "Out Of Date",
+              text: `${res.data.OutOfDate}`,
+              showConfirmButton: false,
+              timer: 2500,
+            });
+            console.log(res.data.OutOfDate);
           } else {
-            console.log(res.data);
+            console.log("From Else ", res.data);
           }
         })
         .then(() => this.getUserReservation());

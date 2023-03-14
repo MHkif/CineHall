@@ -19,23 +19,18 @@
               enctype="multipart/form-data"
               @submit.prevent="register"
             >
-              <div class="relative space-y-2 self-center">
+              <!-- <div class="relative space-y-2 self-center">
                 <div
                   class="w-14 h-14 flex items-center justify-center md:w-20 md:h-20 mx-2 overflow-hidden rounded-full border border-gray-800"
                 >
-                  <input
-                    type="file"
-                    src=""
-                    alt=""
-                    class="absolute inset-0 z-20 opacity-0"
-                  />
+                  <input type="file" class="absolute inset-0 z-20 opacity-0" />
 
                   <img
                     class="object-contain h-full w-full"
                     src="../assets/profile.png"
                   />
                 </div>
-              </div>
+              </div> -->
               <div class="gap-5 flex flex-col md:flex-row md:gap-8">
                 <div class="space-y-1 md:space-y-2 w-full">
                   <div
@@ -293,9 +288,13 @@ export default {
     return {
       username: "",
       email: "",
+      image: "",
     };
   },
   methods: {
+    saveImage() {
+      console.log("Image : ", this.image);
+    },
     async register() {
       const data = new FormData();
       data.append("username", this.username);
@@ -318,7 +317,6 @@ export default {
               confirmButtonText: "Save Your Ref ",
               confirmButtonColor: "#1C1B1F",
             }).then(async () => {
-         
               navigator.clipboard.writeText(ref);
               await Swal.fire({
                 position: "center",
@@ -353,6 +351,5 @@ export default {
       }
     },
   },
- 
 };
 </script>

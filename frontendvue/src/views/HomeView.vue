@@ -4,7 +4,7 @@
 
     <!-- Movies -->
 
-    <section class="px-6 md:px-8" style="font-family: 'Prosto One', cursive">
+    <section class="p-6 md:p-8" style="font-family: 'Prosto One', cursive">
       <div
         class="flex flex-col justify-between items-center gap-6 mt-4 md:flex-row my-8 md:my-10"
       >
@@ -35,7 +35,12 @@
         />
       </div>
 
-      <Cards v-if="movies.length" :movies="movies" :date="selectedDate" :hall="1"/>
+      <Cards
+        v-if="movies.length"
+        :movies="movies"
+        :date="selectedDate"
+        :hall="1"
+      />
       <div
         v-else
         class="flex justify-center items-center text-2xl text-gray-100 min-h-screen"
@@ -78,11 +83,11 @@ export default {
       picker.addEventListener("change", function () {
         var day = new Date(this.value).getDay();
         if (day === 0) {
-          this.empty = "It is Saturday !"
+          this.empty = "It is Saturday !";
           // e.reload();
           this.value = "";
-        
-          alert("Weekends not allowed").then(()=> this.removeWeekend() );
+
+          alert("Weekends not allowed").then(() => this.removeWeekend());
         }
       });
     },
@@ -99,7 +104,7 @@ export default {
           this.movies = res.data;
           if (res.data.Success) {
             this.movies = res.data.Success;
-           
+
             this.empty = "";
           } else if (res.data.Empty) {
             this.movies = [];

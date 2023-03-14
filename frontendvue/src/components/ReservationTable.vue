@@ -18,10 +18,10 @@
           <tr
             v-for="movie in this.movies"
             :key="movie.id"
-            class="text-gray-300"
+            class="text-gray-300 text-left"
           >
             <td class="px-4 py-3">
-              <div class="flex items-center text-sm">
+              <div class="flex justify-start items-center text-sm">
                 <div class="relative w-16 h-20 mr-3 rounded-sm md:block">
                   <img
                     class="object-fit w-full h-full rounded-sm"
@@ -45,7 +45,7 @@
               {{ movie.reserved_at }}
             </td>
 
-            <td class="px-4 py-3 text-sm font-semibold">{{ movie.hall_id }}</td>
+            <td class="px-4 py-3 text-sm font-semibold">{{ movie.hall_name }}</td>
             <td class="px-4 py-3 text-sm font-semibold">
               {{ movie.show_date }}
             </td>
