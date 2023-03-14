@@ -39,7 +39,7 @@
         v-if="movies.length"
         :movies="movies"
         :date="selectedDate"
-        :hall="1"
+       
       />
       <div
         v-else

@@ -71,7 +71,7 @@
             >
               <h1 class="text-white font-medium">Hall</h1>
               <h1 class="text-red-600 font-medium">
-                {{ movie.hall_id }}
+                {{ this.$route.query.hall }}
               </h1>
             </div>
           </div>
@@ -145,7 +145,7 @@ export default {
   mounted() {
     this.getMovie();
     this.getHall();
-    console.log(this.$route);
+    // console.log(this.$route);
     // this.removeWeekend();
   },
   methods: {
@@ -170,10 +170,10 @@ export default {
         });
     },
     getMovieReservedSeats() {
-      // console.log("Hall Id : ", this.movie.hall_id);
+      console.log("Hall Id : ",  this.$route.query.hall);
       const seatsForm = new FormData();
       // formdata.append("user_ref", this.user_ref);
-      seatsForm.append("hall_id", this.movie.hall_id);
+      seatsForm.append("hall_id",  this.$route.query.hall);
       seatsForm.append("show_date", this.$route.query.date);
       seatsForm.append("movie_id", this.movie.id);
       // formdata.append("seat", seat);
@@ -202,35 +202,19 @@ export default {
       });
     },
     getHall() {
-      // console.log("Hall Id : ", this.movie.hall_id);
-      const seatsForm = new FormData();
-      // formdata.append("user_ref", this.user_ref);
-      seatsForm.append("hall_id", this.selectedHall);
-      seatsForm.append("show_date", this.selectedDate);
-      seatsForm.append("movie_id", this.movie.id);
-      // formdata.append("seat", seat);
+     
       axios({
         url: "http://localhost/CineHall/BackEnd/halls/getAllHalls",
         method: "get",
       }).then((res) => (this.halls = res.data));
     },
-    // removeWeekend() {
-    //   const picker = document.getElementById("date1");
-    //   picker.addEventListener("change", function (e) {
-    //     var day = new Date(this.value).getDay();
-    //     if (day === 0) {
-    //       e.preventDefault();
-    //       this.value = "";
-    //       alert("Weekends not allowed");
-    //     }
-    //   });
-    // },
+ 
     reserve(seat) {
       if (seat != null) {
         if (!this.reservedSeats.includes(seat)) {
           const formdata = new FormData();
           formdata.append("user_ref", this.user_ref);
-          formdata.append("hall_id", this.movie.hall_id);
+          formdata.append("hall_id",  this.$route.query.hall);
           formdata.append("show_date", this.$route.query.date);
           formdata.append("movie_id", this.movie.id);
           formdata.append("seat", seat);

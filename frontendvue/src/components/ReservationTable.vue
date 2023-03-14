@@ -52,7 +52,7 @@
             <td class="px-4 py-3 text-sm">{{ movie.seat_number }}</td>
             <td class="py-4 px-6 text-sm space-x-2 text-center text-red-600">
               <!-- <div $emit('cancle', movie.res_id, movie.user_ref)  @click="cancel(movie.res_id, movie.user_ref)">Cancel</div> -->
-              <div @click="this.$emit('cancel', movie.res_id, movie.user_ref, movie.id_of_movie, movie.hall_id)">
+              <div @click="this.$emit('cancel', movie.res_id, movie.user_ref, movie.id_of_movie, movie.id_of_hall)">
                 Cancel
               </div>
             </td>

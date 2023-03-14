@@ -8,7 +8,7 @@
       :image="movie.image"
       :title="movie.title"
       :id="movie.id"
-      :hall_id="movie.hall_id"
+      :hall_id="movie.shown_hall"
       :date="date"
     />
   </div>

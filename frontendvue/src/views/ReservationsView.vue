@@ -70,7 +70,7 @@ export default {
         });
     },
     cancel(res_id, ref, movie_id, hall_id) {
-      console.log("id : ", res_id, "user_ref : ", ref);
+      console.log("id : ", res_id, "user_ref : ", ref, "hall : ",hall_id);
       const formdata = new FormData();
       formdata.append("user_ref", ref);
       formdata.append("res_id", res_id);

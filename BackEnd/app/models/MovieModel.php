@@ -17,12 +17,11 @@ class MovieModel
 
 
         $sql =
-            'INSERT INTO `movies`( `rank`, `hall_id`, `title`, `thumbnail`, `rating`, `year`, `image`, `description`, `trailer`, `genre`, `director`, `writers`, `imdbid`)
-             VALUES (:rank , :hall_id, :title, :thumbnail, :rating, :year, :image, :description, :trailer, :genre, :director, :writers, :imdbid)';
+            'INSERT INTO `movies`( `rank`, `title`, `thumbnail`, `rating`, `year`, `image`, `description`, `trailer`, `genre`, `director`, `writers`, `imdbid`)
+             VALUES (:rank , :title, :thumbnail, :rating, :year, :image, :description, :trailer, :genre, :director, :writers, :imdbid)';
         $this->db->prepareQuery($sql);
         $this->db->bind(':rank', $data->rank);
         $this->db->bind(':title', $data->title);
-        $this->db->bind(':hall_id', 1);
         $this->db->bind(':thumbnail', $data->thumbnail);
         $this->db->bind(':rating', $data->rating);
         $this->db->bind(':year', $data->year);
@@ -69,7 +68,7 @@ class MovieModel
         // die(var_dump($date));
         $d = $date;
         // $sqlDate = "SELECT * FROM `movies` WHERE MONTH(movies.date) = MONTH(:id)  AND YEAR(movies.date) = YEAR(NOW()) AND DATE(movies.date) >= NOW()";
-        $sqlDate = "SELECT sh.*, m.* FROM shown_movies sh INNER JOIN movies m ON m.id = sh.movie_id WHERE date(sh.date) = date(:d) AND date(:d) >= date(now()) AND sh.seats < 50
+        $sqlDate = "SELECT sh.*, m.*,sh.hall_id as 'shown_hall'  FROM shown_movies sh INNER JOIN movies m ON m.id = sh.movie_id WHERE date(sh.date) = date(:d) AND date(:d) >= date(now()) AND sh.seats < 50
         ";
 
         $this->db->prepareQuery($sqlDate);
@@ -88,7 +87,7 @@ class MovieModel
 
     public function getMovieById($id)
     {
-        $sql = 'SELECT `id`, `rank`, `hall_id`, `title`, `thumbnail`, `rating`, `year`, `image`, `description`, `trailer`, `genre`, `director`, `writers`, `imdbid`, `date` FROM '
+        $sql = 'SELECT * FROM '
             . $this->tableName . ' WHERE id = :id';
         $this->db->prepareQuery($sql);
         $this->db->bind(':id', $id);
@@ -107,7 +106,7 @@ class MovieModel
 
     public function getMovieByCategory($genre)
     {
-        $sql = 'SELECT `id`, `rank`, `hall_id`, `title`, `thumbnail`, `rating`, `year`, `image`, `description`, `trailer`, `genre`, `director`, `writers`, `imdbid`, `date` FROM '
+        $sql = 'SELECT * FROM '
             . $this->tableName . ' WHERE genre = :genre';
         $this->db->prepareQuery($sql);
         $this->db->bind(':genre', $genre);
@@ -125,7 +124,7 @@ class MovieModel
     public function findMovie($value, $key = "title")
     {
         $query = "WHERE $key LIKE '%$value%'";
-        $sql = 'SELECT `id`, `rank`, `hall_id`, `title`, `thumbnail`, `rating`, `year`, `image`, `description`, `trailer`, `genre`, `director`, `writers`, `imdbid`, `date` FROM '
+        $sql = 'SELECT * FROM '
             . $this->tableName . ' ' . $query;
         $this->db->prepareQuery($sql);
         $this->db->bind(':' . $key, $value);

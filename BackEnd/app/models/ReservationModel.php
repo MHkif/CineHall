@@ -178,13 +178,16 @@ class ReservationModel
     }
     public function checkShow_date($hall_id, $movie_id)
     {
-        $sql = 'SELECT * FROM shown_movies WHERE hall_id = :hall_id AND (DATEDIFF(shown_movies.date , CURDATE()) > 1) AND movie_id = :movie';
+        // die(print_r([$hall_id, $movie_id]));
+        $sql = 'SELECT * FROM shown_movies WHERE  (DATEDIFF(shown_movies.date , CURDATE()) > 1) AND hall_id = :hall_id  AND movie_id = :movie';
         $this->db->prepareQuery($sql);
         $this->db->bind(':hall_id', $hall_id);
         $this->db->bind(':movie', $movie_id);
-
-        $row = $this->db->singleRow();
-
+        $movie = $this->db->singleRow();
+        // $date1 = date_create($movie->date);
+        // $date2= date_create(date("Y-m-d"));
+        // $diff=date_diff($date2, $date1);
+        // $date = $diff->format("%R%a");
         if ($this->db->rowCount() > 0) {
             return true;
         } else {
@@ -198,7 +201,7 @@ class ReservationModel
         // $sql = 'SELECT * FROM reservations WHERE movie_id IN (SELECT movie_id FROM shown_movies WHERE DATEDIFF(date , CURDATE()) > 1) AND id = :id AND user_ref = :ref';
         $sql = 'SELECT * FROM reservations WHERE id = :id AND user_ref = :ref';
         $isOutOfDate = $this->checkShow_date($data['hall_id'], $data['movie_id']);
-
+        // die(var_dump($isOutOfDate));
         if ($isOutOfDate) {
             $this->db->prepareQuery($sql);
             $this->db->bind(':id', $data['res_id']);
